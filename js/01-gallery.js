@@ -18,17 +18,17 @@ function createItem({ preview, original, description }) {
 `;
 }
 
-function createAllgallery(object) {
+function galleryMarkup(object) {
   return object.map((item) => createItem(item)).join("");
 }
 
-refs.gallery.innerHTML = createAllgallery(galleryItems);
+refs.gallery.innerHTML = galleryMarkup(galleryItems);
 
-refs.gallery.addEventListener("click", onClickImageModelZoom);
+refs.gallery.addEventListener("click", onClickImageModalZoom);
 
-function onClickImageModelZoom(event) {
+function onClickImageModalZoom(event) {
   event.preventDefault();
-  if (event.target.nodeName !== "IMG") {
+  if (!event.target.classList.contains("gallery__image")) {
     return;
   }
 
@@ -43,17 +43,28 @@ function onClickImageModelZoom(event) {
             src="${bigImageUrl}"
               />
               </div>
-              `
+              `,
+    {
+      onShow: (instance) => {
+        window.addEventListener("keydown", onEscapeCloseModal);
+      },
+      onClose: (instance) => {
+        window.removeEventListener("keydown", onEscapeCloseModal);
+      },
+    }
   );
 
-  instance.show();
-
-  window.addEventListener("keydown", instanceCloseModal);
-
-  function instanceCloseModal(event) {
+  function onEscapeCloseModal(event) {
     if (event.code === "Escape") {
       instance.close();
-      window.removeEventListener("keydown", instanceCloseModal);
     }
+  }
+  instance.show();
+
+  const modalImage = document.querySelector(".modal img");
+  modalImage.addEventListener("click", onClickCloseModal);
+
+  function onClickCloseModal() {
+    instance.close();
   }
 }
